@@ -53,4 +53,9 @@ class Collector
             $iflight->datefrom . '-' . $iflight->dateto,
             $weekday);
     }
+
+    public static function CleanFN($fn)
+    {
+        return preg_replace('#\s{2,}#', '', $fn);
+    }
 }

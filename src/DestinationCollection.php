@@ -22,26 +22,9 @@ class DestinationCollection
         $this->tiledata = $airports;
     }
 
-    public static function buildFlights($tiledata)
-    {
-        $points = $airport->getPoints();
-//        var_dump($points);
-//        var_dump($airport->id);
-//        var_dump($this->tiledata);
-        $available_destinations = array_filter($tiledata, function (Airport $e) use ($points) {
-            return in_array($e->id, $points, true);
-        });
-
-        $flights = [];
-        foreach($tiledata as $dest){
-            $fd = new FlightData();
-            $fd->from = $airport;
-            $fd->to = $dest;
-
-            $flights[] = $fd;
-        }
-
-        return $flights;
-    }
+//    public static function CollectFlightNumbers(Scraper)
+//    {
+//
+//    }
 
 }

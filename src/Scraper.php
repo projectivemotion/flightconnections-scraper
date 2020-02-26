@@ -59,7 +59,7 @@ class Scraper
         return new Airport(null, $id);
     }
 
-    public function fetchDepartures(Airport $airport)
+    public function fetchDestinations(Airport $airport)
     {
         $response = $this->client->request('GET', '/ro' . $airport->id . '.json?v=&f=no0&direction=from&exc=&ids=');
         $pointdata = \GuzzleHttp\json_decode($response->getBody(), false);
@@ -112,7 +112,7 @@ class Scraper
         return $airports;
     }
 
-    public function getFlights(FlightData $fd)
+    public function getRoutes(FlightData $fd)
     {
         $url = "/ro{$fd->from->id}_{$fd->to->id}.json?v=&f=no0&direction=from&exc=&ids=";
         $promise = $this->client->getAsync($url);
@@ -122,12 +122,14 @@ class Scraper
 
     /**
      * Returns a stdclass with airline (str) and flights (arr)
+     * The flights value contains full flight information includign:
+     * flight code, weekdays, time of departure and time of arrival.
      *
      * @param FlightData $fd
      * @param $routeid
      * @return mixed
      */
-    public function validify(FlightData $fd, $routeid)
+    public function getRouteFlightInformation(FlightData $fd, $routeid)
     {
         $post = [
             'dep' => $fd->from->id,
