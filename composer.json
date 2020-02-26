@@ -1,0 +1,21 @@
+{
+    "name": "projectivemotion/flightconnections",
+    "description": "Flight Connections Com Data Scraper",
+    "type": "library",
+    "require": {
+        "projectivemotion/php-scraper-tools": "~1",
+        "guzzlehttp/guzzle": "6.5"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Amado Martinez",
+            "email": "amado@projectivemotion.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "projectivemotion\\flightconnections\\" : "src/"
+        }
+    }
+}
