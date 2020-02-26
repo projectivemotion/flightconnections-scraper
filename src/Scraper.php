@@ -10,8 +10,6 @@ namespace projectivemotion\flightconnections;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Promise;
-use GuzzleHttp\Psr7\Request;
-use projectivemotion\PhpScraperTools\CacheScraper;
 
 class Scraper
 {
@@ -39,11 +37,7 @@ class Scraper
         $airport->id = $arr[0]->id;
 
         return $airport;
-
-//        $this->client->request('GET', '/ro113.json?v=826&f=no0&direction=from&exc=&ids=');
     }
-
-
 
     public function initClient(){
         $this->client = new Client(['base_uri' => 'https://www.flightconnections.com/']);
@@ -59,6 +53,10 @@ class Scraper
         return new Airport(null, $id);
     }
 
+    /**
+     * @param Airport $airport
+     * @return FlightData[]
+     */
     public function fetchDestinations(Airport $airport)
     {
         $response = $this->client->request('GET', '/ro' . $airport->id . '.json?v=&f=no0&direction=from&exc=&ids=');
@@ -112,9 +110,14 @@ class Scraper
         return $airports;
     }
 
-    public function getRoutes(FlightData $fd)
+    /**
+     * @param FlightData $fd
+     * @param string $direction from (outbound) or to (return)
+     * @return mixed
+     */
+    public function getRoutes(FlightData $fd, $direction = 'from')
     {
-        $url = "/ro{$fd->from->id}_{$fd->to->id}.json?v=&f=no0&direction=from&exc=&ids=";
+        $url = "/ro{$fd->from->id}_{$fd->to->id}.json?v=&f=no0&direction={$direction}&exc=&ids=";
         $promise = $this->client->getAsync($url);
 
         return $promise;
@@ -129,12 +132,13 @@ class Scraper
      * @param $routeid
      * @return mixed
      */
-    public function getRouteFlightInformation(FlightData $fd, $routeid)
+    public function getRouteFlightInformation(Route $route)
     {
+        $fd = $route->fd;
         $post = [
             'dep' => $fd->from->id,
             'des' => $fd->to->id,
-            'id' => $routeid,
+            'id' => $route->rid,
             'startDate' => date('Y'),
             'endDate' => date('Y')+1
         ];
@@ -144,12 +148,10 @@ class Scraper
         ]);
 
         return \GuzzleHttp\json_decode($response->getBody(), false);
-//
-//        curl 'https://www.flightconnections.com/validity.php' -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0' -H 'Accept: */*' -H 'Accept-Language: en-US,en;q=0.5'
-//    --compressed -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: https://www.flightconnections.com'
-//    -H 'Connection: keep-alive' -H 'Referer: https://www.flightconnections.com/flights-from-gothenburg-got'
-//    -H 'Cookie: waldo-pbjs-pubCommonId=336109d1-39c0-4d0c-8e0f-f9e7ce7426bb; _ga=GA1.2.1235278324.1582671055; _gid=GA1.2.1584192879.1582671055; __gads=ID=5727f2c8f83b719c:T=1582671055:S=ALNI_MaoD17qKIvjkqi09pLrwXZSbpeVZg; waldo-pbjs-unifiedid=%7B%22TDID%22%3A%22e569e6d7-0f34-465a-b9ff-a7a59a7ced59%22%2C%22TDID_LOOKUP%22%3A%22FALSE%22%2C%22TDID_CREATED_AT%22%3A%222020-02-25T22%3A50%3A58%22%7D; intent_media_prefs=; im_puid=2f791d2d-2a0d-437e-ad08-6fe4d974fac8; _hjid=bb62a977-2892-4fea-940c-5b74610a626c; _hjIncludedInSample=1; _hjShownFeedbackMessage=true; waldo_country=MX; waldo_continent=NA; waldo_region=28; im_snid=59802a59-07e2-43e8-ab51-fcb2ca297f0b; _gat=1'
-//    --data 'dep=113&des=45&id=39&startDate=2020&endDate=2021'
     }
 
+    public function getReturnRouteFlightInformation(FlightData $fd)
+    {
+
+    }
 }

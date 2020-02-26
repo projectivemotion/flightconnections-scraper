@@ -24,5 +24,12 @@ class FlightData
     public function getHash(){
         return $this->from->id . '_' . $this->to->id;
     }
+
+    public function returnFD(){
+        $fd = new FlightData();
+        $fd->from = $this->to;
+        $fd->to = $this->from;
+        return $fd;
+    }
 //https://www.flightconnections.com/ro113_326.json?v=826&f=no0&direction=from&exc=&ids=
 }
