@@ -61,6 +61,9 @@ class Collector
 //    var_export($response);
         }
 
+        header("Content-Type: text/tsv", true);
+        header("Content-Disposition: attachment, filename=\"$airport->code.tsv\"");
+
         printf(join("\t", [
                 'Airline',
                 'Departure',
@@ -70,6 +73,7 @@ class Collector
             'Outbound',
             'Inbound'
         ]) . "\n");
+        $afname = preg_replace('#\(.+\)$#', '', $airport->name);
 
         foreach($collect_estfn as $did => $flights){
             $dairport = $t->findAirportById($did);
@@ -79,7 +83,6 @@ class Collector
             $returns = $flights[2]->flights;
 
             $adname = preg_replace('#\(.+\)$#', '', $dairport->name);
-            $afname = preg_replace('#\(.+\)$#', '', $airport->name);
 
             printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", $airline, $afname, $adname, $airport->code, $dairport->code,
                 implode(',', $departures),  implode(',', $returns));
