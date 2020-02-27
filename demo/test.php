@@ -5,7 +5,8 @@
     $c = new \projectivemotion\flightconnections\Collector();
     $t->fetchEuropeAirports();
 
-    $depart = 'SKG';
+    $depart = 'ATH';
+    $depart = 'GOT';
 
     if(isset($_POST['from']))
         $depart = strtoupper($_POST['from']);

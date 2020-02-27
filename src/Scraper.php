@@ -45,10 +45,13 @@ class Scraper
 //        $this->client->request('GET', '/ro113.json?v=826&f=no0&direction=from&exc=&ids=');
     }
 
-    public function findAirportById($id)
+    public function findAirportById($id, $fail = false)
     {
         if(isset($this->airports[$id]))
             return $this->airports[$id];
+
+        if($fail)
+            throw new Exception('Unknown ID: ' . $id);
 
         return new Airport(null, $id);
     }
@@ -77,13 +80,14 @@ class Scraper
     }
 
     public function fetchEuropeAirports(){
-        $zoom = 4;
+//        $zoom = [4, 6,11,2,7];  // zoom 4 , 6-11 x 2-7 y
+        $zoom = [3, 1,6,1,4];  // zoom 3, 1-6 x, 1-4 y
         $promises = [];
         // european map ranges 6..11 on x and 2..7 on y on zoom=4
 
-        for($x = 6; $x <= 11; $x++){
-            for($y = 2; $y <= 7 ; $y++){
-                $promises[] = $this->client->getAsync('/tiles/en/' . $zoom . '/' . $x. '-' . $y . '.json');
+        for($x = $zoom[1]; $x <= $zoom[2]; $x++){
+            for($y = $zoom[3]; $y <= $zoom[4] ; $y++){
+                $promises[] = $this->client->getAsync('/tiles/en/' . $zoom[0] . '/' . $x. '-' . $y . '.json');
             }
         }
 
