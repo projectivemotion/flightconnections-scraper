@@ -118,7 +118,7 @@ class Collector
         ];
         $printrow = function ($h, $row, $sheete){
             for($i = 0; $i < count($h); $i++)
-                $sheete->setCellValueByColumnAndRow($i, $row, $h[$i]);
+                $sheete->setCellValueByColumnAndRow($i+1, $row, $h[$i]);
         };
 
         $printrow($h, 1, $sheet);
