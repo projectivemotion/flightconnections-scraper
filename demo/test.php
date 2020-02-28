@@ -5,7 +5,6 @@
     $c = new \projectivemotion\flightconnections\Collector();
     $t->fetchEuropeAirports();
 
-    $depart = 'ATH';
     $depart = 'GOT';
 
     if(isset($_POST['from']))
@@ -14,3 +13,5 @@
     $airport = $t->fetchAirport(new \projectivemotion\flightconnections\Airport($depart));
 
     $c->getFlightNumberData($t, $airport);
+
+//    \projectivemotion\flightconnections\Collector::asXLS(null, null, null);

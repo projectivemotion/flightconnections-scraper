@@ -3,7 +3,8 @@
     "description": "Flight Connections Com Data Scraper",
     "type": "library",
     "require": {
-        "guzzlehttp/guzzle": "6.5"
+        "guzzlehttp/guzzle": "^6.5",
+        "phpoffice/phpspreadsheet": "^1.8"
     },
     "license": "MIT",
     "authors": [

@@ -9,6 +9,9 @@
 namespace projectivemotion\flightconnections;
 
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
+
 class Collector
 {
     protected $routes;
@@ -61,6 +64,13 @@ class Collector
 //    var_export($response);
         }
 
+//        return $collect_estfn;
+//        return self::asTSV($airport, $collect_estfn, $t);
+        return self::asXLS($airport, $collect_estfn, $t);
+    }
+
+    public static function asTSV($airport, $collect_estfn, Scraper $t)
+    {
         header("Content-Type: text/tsv", true);
         header("Content-Disposition: attachment; filename=\"$airport->code.tsv\"", true);
 
@@ -69,10 +79,10 @@ class Collector
                 'Departure',
                 'Destination',
                 'Code',
-            'Code',
-            'Outbound',
-            'Inbound'
-        ]) . "\n");
+                'Code',
+                'Outbound',
+                'Inbound'
+            ]) . "\n");
         $afname = preg_replace('#\(.+\)$#', '', $airport->name);
 
         foreach($collect_estfn as $did => $flights){
@@ -87,7 +97,78 @@ class Collector
             printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", $airline, $afname, $adname, $airport->code, $dairport->code,
                 implode(',', $departures),  implode(',', $returns));
         }
+    }
 
+    public static function asXLS($airport, $collect_estfn, Scraper $t)
+//    public static function asXLS($airport, $collect_estfn, $t)
+    {
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$airport->code.xls\"", true);
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $h = [
+            'Airline',
+            'Departure',
+            'Destination',
+            'Code',
+            'Code',
+            'Outbound',
+            'Inbound'
+        ];
+        $printrow = function ($h, $row, $sheete){
+            for($i = 0; $i < count($h); $i++)
+                $sheete->setCellValueByColumnAndRow($i, $row, $h[$i]);
+        };
+
+        $printrow($h, 1, $sheet);
+
+        $afname = preg_replace('#\(.+\)$#', '', $airport->name);
+
+        $rn = 2;
+        foreach($collect_estfn as $did => $flights){
+            $dairport = $t->findAirportById($did, true);
+
+            $airline = $flights[1]->airline;
+            $departures = $flights[1]->flights;
+            $returns = $flights[2]->flights;
+
+            $adname = preg_replace('#\(.+\)$#', '', $dairport->name);
+
+            $rdata = [$airline, $afname, $adname, $airport->code, $dairport->code,
+                implode(',', $departures),  implode(',', $returns)];
+            $printrow($rdata, $rn++, $sheet);
+        }
+
+//        $sheet->setCellValueByColumnAndRow(1,1, 'Hello World !');
+        $writer = new Xls($spreadsheet);
+        $writer->save('php://output');
+        return;
+//
+//
+//        printf(join("\t", [
+//                'Airline',
+//                'Departure',
+//                'Destination',
+//                'Code',
+//                'Code',
+//                'Outbound',
+//                'Inbound'
+//            ]) . "\n");
+//        $afname = preg_replace('#\(.+\)$#', '', $airport->name);
+//
+//        foreach($collect_estfn as $did => $flights){
+//            $dairport = $t->findAirportById($did, true);
+//
+//            $airline = $flights[1]->airline;
+//            $departures = $flights[1]->flights;
+//            $returns = $flights[2]->flights;
+//
+//            $adname = preg_replace('#\(.+\)$#', '', $dairport->name);
+//
+//            printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", $airline, $afname, $adname, $airport->code, $dairport->code,
+//                implode(',', $departures),  implode(',', $returns));
+//        }
     }
 
     public static function FlightNumbersOnly($routeflights)
