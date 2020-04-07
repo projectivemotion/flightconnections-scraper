@@ -80,8 +80,8 @@ class Scraper
     }
 
     public function fetchEuropeAirports(){
-//        $zoom = [4, 6,11,2,7];  // zoom 4 , 6-11 x 2-7 y
-        $zoom = [3, 1,6,1,4];  // zoom 3, 1-6 x, 1-4 y
+        $zoom = [4, 6,11,2,7];  // zoom 4 , 6-11 x 2-7 y
+//        $zoom = [3, 1,6,1,4];  // zoom 3, 1-6 x, 1-4 y
         $promises = [];
         // european map ranges 6..11 on x and 2..7 on y on zoom=4
 

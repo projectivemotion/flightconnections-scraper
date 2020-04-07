@@ -3,6 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Download Test</title>
+    <script>
+        function loadresults(){
+
+            fetch('/test.php').then(r => r.json()).then(p => {
+                // debugger;
+
+                const res = document.getElementById('results');
+
+                p.list.map(code => {
+                    const a = document.createElement('A');
+                    a.href = '/test.php?from=' + code;
+                    a.setAttribute('target', '_blank');
+                    a.innerText = code;
+
+                    return a;
+                }).forEach(e => res.append(e));
+            });
+
+            setTimeout(loadresults, 5000);
+        }
+
+        setTimeout(loadresults, 3000);
+    </script>
 </head>
 <body>
 <form action="test.php" method="POST" target="_blank">
@@ -13,5 +36,8 @@
 
     <p>Created by <a href="mailto:amado@projectivemotion.com">Houdini</a></p>
 </form>
+<div id="results">
+
+</div>
 </body>
 </html>

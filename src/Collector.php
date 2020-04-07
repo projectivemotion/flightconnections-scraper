@@ -64,9 +64,7 @@ class Collector
 //    var_export($response);
         }
 
-//        return $collect_estfn;
-//        return self::asTSV($airport, $collect_estfn, $t);
-        return self::asXLS($airport, $collect_estfn, $t);
+        return $collect_estfn;
     }
 
     public static function asTSV($airport, $collect_estfn, Scraper $t)
@@ -99,9 +97,11 @@ class Collector
         }
     }
 
-    public static function asXLS($airport, $collect_estfn, Scraper $t)
+    public function asXLS(Airport $airport, Scraper $t)
 //    public static function asXLS($airport, $collect_estfn, $t)
     {
+        $collect_estfn = $this->getFlightNumberData($t, $airport);
+
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$airport->code.xls\"", true);
         $spreadsheet = new Spreadsheet();
@@ -143,7 +143,7 @@ class Collector
 //        $sheet->setCellValueByColumnAndRow(1,1, 'Hello World !');
         $writer = new Xls($spreadsheet);
         $writer->save('php://output');
-        return;
+        return $writer;
 //
 //
 //        printf(join("\t", [

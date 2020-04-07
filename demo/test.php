@@ -1,17 +1,64 @@
 <?php
     require_once __DIR__ . '/../vendor/autoload.php';
 
-    $t = new \projectivemotion\flightconnections\Scraper();
-    $c = new \projectivemotion\flightconnections\Collector();
-    $t->fetchEuropeAirports();
+//    $depart = 'GOT';
+    $depart = '';
 
-    $depart = 'GOT';
+    function checkresults($from){
+        $worker = new \GearmanWorker();
+        $worker->addServer('gearman');
+        $worker->setTimeout(2000);
 
-    if(isset($_POST['from']))
+        $result = false;
+        $worker->addFunction('report-data-' . $from, function ($job) use ($from, &$result) {
+            $data = unserialize($job->workload());
+
+            ecHO "Got Data $from data: ";
+            var_export($data);
+            $result = true;
+        });
+
+        $worker->work();
+        return $result;
+    }
+
+    if(isset($_GET['from']))
+    {
+        $depart = $_GET['from'];
+        checkresults($_GET['from']);
+    }
+
+    // load results
+    if(isset($_POST['from'])) {
         $depart = strtoupper($_POST['from']);
+        if(!checkresults($depart)){
+            $server = new \GearmanClient();
+            $server->addServer('gearman');
 
-    $airport = $t->fetchAirport(new \projectivemotion\flightconnections\Airport($depart));
+            $server->doBackground('exec', $depart);
+            echo 'Processing..';
+        }
+    }
 
-    $c->getFlightNumberData($t, $airport);
+    if(!$depart){
+        $redis = new \Redis();
+        $redis->connect('redis');
 
-//    \projectivemotion\flightconnections\Collector::asXLS(null, null, null);
+        $list = $redis->lrange('ready-jobs', 0, -1);
+        $redis->del('ready-jobs');
+
+//        var_export($list);
+
+        header("Content-type:", "text/json");
+        echo \json_encode([
+            'list' => $list
+        ]);
+    }
+
+
+//    $airport = $t->fetchAirport(new \projectivemotion\flightconnections\Airport($depart));
+//
+//    // print xls
+//    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+//    header("Content-Disposition: attachment; filename=\"$airport->code.xls\"", true);
+//    $c->asXLS($airport, $t)->save('php://output');
