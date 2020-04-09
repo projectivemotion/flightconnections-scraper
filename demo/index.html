@@ -11,30 +11,54 @@
 
                 const res = document.getElementById('results');
 
+		    p.list.forEach(code => document.querySelectorAll('.loading-' + code).forEach(e => document.body.removeChild(e)));
+
                 p.list.map(code => {
                     const a = document.createElement('A');
                     a.href = '/test.php?from=' + code;
                     a.setAttribute('target', '_blank');
-                    a.innerText = code;
+                    a.innerText = 'Download ' + code;
 
                     return a;
-                }).forEach(e => res.append(e));
+		}).forEach(e => {
+			res.append(e);
+
+		});
             });
 
             setTimeout(loadresults, 5000);
         }
 
         setTimeout(loadresults, 3000);
+
+function fsubmit(e){
+
+	e.preventDefault();
+	const fromstr = document.getElementById('from').value.toUpperCase();
+	fetch('/test.php?start=1&from=' + fromstr).then(r => r.text()).
+		then(str => {
+			const div = document.createElement('DIV');
+			div.classList.add('loading-' + fromstr);
+			div.innerHTML = str;
+			// debugger;
+			document.body.append(div);
+		});
+	document.forms[0].reset();
+	return false;
+}
     </script>
+<style>
+a { display: block; }
+</style>
 </head>
 <body>
-<form action="test.php" method="POST" target="_blank">
+	<form onsubmit="fsubmit(event)" action="test.php" method="POST">
     <h1>Flight Connections Download</h1>
     <p><a href="http://flightconnections.com" target="_blank">flightconnections.com</a></p>
-    <input type="text" placeholder="Airport Code" name="from" required>
+    <input type="text" placeholder="Airport Code" name="from" id="from" required>
     <button type="submit">Download</button>
 
-    <p>Created by <a href="mailto:amado@projectivemotion.com">Houdini</a></p>
+    <p>Created by <a href="mailto:amado@projectivemotion.com">Amado</a></p>
 </form>
 <div id="results">
 

@@ -4,6 +4,11 @@
 //    $depart = 'GOT';
     $depart = '';
 
+        $redis = new \Redis();
+        $redis->connect('redis');
+        $list = $redis->lrange('ready-jobs', 0, -1);
+
+
     function checkresults($from){
         $worker = new \GearmanWorker();
         $worker->addServer('gearman');
@@ -24,27 +29,21 @@
 
     if(isset($_GET['from']))
     {
-        $depart = $_GET['from'];
-        checkresults($_GET['from']);
-    }
+        $depart = strtoupper($_GET['from']);
 
-    // load results
-    if(isset($_POST['from'])) {
-        $depart = strtoupper($_POST['from']);
-        if(!checkresults($depart)){
+    // if($nohasresults){
+    if(isset($_GET['start'])){
             $server = new \GearmanClient();
             $server->addServer('gearman');
 
             $server->doBackground('exec', $depart);
-            echo 'Processing..';
-        }
+            echo $depart . ' Processing..';
+    }
+    else
+	    checkresults($depart);
     }
 
     if(!$depart){
-        $redis = new \Redis();
-        $redis->connect('redis');
-
-        $list = $redis->lrange('ready-jobs', 0, -1);
         $redis->del('ready-jobs');
 
 //        var_export($list);
