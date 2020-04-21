@@ -14,14 +14,18 @@ $worker->addServer('gearman');
 $redis = new \Redis();
 $redis->connect('redis');
 
-
-echo "Loading Airports..";
-
 // initialize
 $t = new \projectivemotion\flightconnections\Scraper();
-$t->fetchEuropeAirports();
 
-echo "\n\n... waiting";
+$str = $redis->get("AIRPORTS");
+if($str){
+    echo "Loaded Airports from Cache..\n";
+    $t->setAirports(unserialize($str));
+}else {
+    echo "Loading Airports..\n";
+    $airports = $t->fetchEuropeAirports();
+    $redis->set("AIRPORTS", serialize($airports), ['EX' => 60]);   // 5 min
+}
 
 $worker->addFunction("exec",
     function ($job) use ($client, $t, $redis) {
@@ -41,7 +45,7 @@ $worker->addFunction("exec",
     return '';
 });
 
-echo "Working..";
+echo "Waiting for work..";
 while ($worker->work());
 
 echo "Bye..";

@@ -4,9 +4,9 @@
 //    $depart = 'GOT';
     $depart = '';
 
-        $redis = new \Redis();
-        $redis->connect('redis');
-        $list = $redis->lrange('ready-jobs', 0, -1);
+    $redis = new \Redis();
+    $redis->connect('redis');
+    $list = $redis->lrange('ready-jobs', 0, -1);
 
 
     function checkresults($from){

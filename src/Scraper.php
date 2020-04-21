@@ -85,9 +85,16 @@ class Scraper
         $promises = [];
         // european map ranges 6..11 on x and 2..7 on y on zoom=4
 
-        for($x = $zoom[1]; $x <= $zoom[2]; $x++){
-            for($y = $zoom[3]; $y <= $zoom[4] ; $y++){
-                $promises[] = $this->client->getAsync('/tiles/en/' . $zoom[0] . '/' . $x. '-' . $y . '.json');
+//        $test = 10;
+        $go = true;
+        for($x = $zoom[1]; $go && $x <= $zoom[2]; $x++){
+            for($y = $zoom[3]; $go && $y <= $zoom[4] ; $y++){
+                $url = '/tiles/en/' . $zoom[0] . '/' . $x. '-' . $y . '.json';
+                $promises[] = $this->client->getAsync($url);
+
+//                echo $url, "\n";
+//                if($test && $test-- == 0)
+//                    $go = false;
             }
         }
 
@@ -112,6 +119,14 @@ class Scraper
 
         $this->airports = $airports;
         return $airports;
+    }
+
+    /**
+     * @param mixed $airports
+     */
+    public function setAirports($airports)
+    {
+        $this->airports = $airports;
     }
 
     /**
