@@ -127,7 +127,7 @@ class Collector
 
         $rn = 2;
         foreach($collect_estfn as $did => $flights){
-            $dairport = $t->findAirportById($did, true);
+            $dairport = $t->findAirportById($did, false);
 
             $airline = $flights[1]->airline;
             $departures = $flights[1]->flights;

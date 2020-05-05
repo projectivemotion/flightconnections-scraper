@@ -24,7 +24,7 @@ if($str){
 }else {
     echo "Loading Airports..\n";
     $airports = $t->fetchEuropeAirports();
-    $redis->set("AIRPORTS", serialize($airports), ['EX' => 60]);   // 5 min
+    $redis->set("AIRPORTS", serialize($airports), ['EX' => 3600]);   // 5 min
 }
 
 $worker->addFunction("exec",
@@ -33,8 +33,11 @@ $worker->addFunction("exec",
     $airportstr = $job->workload();
     echo "Airport: $airportstr\n";
 
-//    $airport = $t->fetchAirport(new \projectivemotion\flightconnections\Airport($airportstr));
-//    $collect_estfn = $this->getFlightNumberData($t, $airport);
+    $airport = $t->fetchAirport(new \projectivemotion\flightconnections\Airport($airportstr));
+       $c  = new \projectivemotion\flightconnections\Collector();
+    $collect_estfn = $c->getFlightNumberData($t, $airport);
+
+    //    $collect_estfn = '99';
 
     $collect_estfn = '99';
 
